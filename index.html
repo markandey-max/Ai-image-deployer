@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Image Injector</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+    }
+    input, textarea, button {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    iframe {
+      width: 100%;
+      height: 300px;
+      border: 1px solid #ccc;
+      background: white;
+    }
+    label {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>AI Image Injector Tool</h1>
+
+  <label>Upload Logo Image:</label>
+  <input type="file" id="logoInput" accept="image/*">
+
+  <label>Upload Background Image:</label>
+  <input type="file" id="bgInput" accept="image/*">
+
+  <label>Upload Product Image:</label>
+  <input type="file" id="productInput" accept="image/*">
+
+  <label>Paste Your HTML/CSS Code (use {{logo}}, {{background}}, {{product}} as placeholders):</label>
+  <textarea id="codeArea" rows="10" placeholder="Paste your code here..."></textarea>
+
+  <button onclick="updatePreview()">Preview</button>
+  <button onclick="downloadCode()">Download Final File</button>
+
+  <h3>Preview:</h3>
+  <iframe id="previewFrame"></iframe>
+
+  <script>
+    let images = {};
+
+    document.getElementById('logoInput').addEventListener('change', function(e) {
+      readImage(e.target.files[0], 'logo');
+    });
+
+    document.getElementById('bgInput').addEventListener('change', function(e) {
+      readImage(e.target.files[0], 'background');
+    });
+
+    document.getElementById('productInput').addEventListener('change', function(e) {
+      readImage(e.target.files[0], 'product');
+    });
+
+    function readImage(file, key) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        images[key] = e.target.result;
+      }
+      reader.readAsDataURL(file);
+    }
+
+    function updatePreview() {
+      let code = document.getElementById('codeArea').value;
+      code = code.replace(/{{logo}}/g, images.logo || '')
+                 .replace(/{{background}}/g, images.background || '')
+                 .replace(/{{product}}/g, images.product || '');
+      const frame = document.getElementById('previewFrame');
+      frame.srcdoc = code;
+    }
+
+    function downloadCode() {
+      let code = document.getElementById('codeArea').value;
+      code = code.replace(/{{logo}}/g, images.logo || '')
+                 .replace(/{{background}}/g, images.background || '')
+                 .replace(/{{product}}/g, images.product || '');
+
+      const blob = new Blob([code], { type: 'text/html' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'final_code.html';
+      link.click();
+    }
+  </script>
+</body>
+</html>
